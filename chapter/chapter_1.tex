@@ -1,0 +1,44 @@
+\section{Giới thiệu đề tài}
+
+\subsection{Đặt vấn đề và mục tiêu thiết kế}
+
+Phép nhân ma trận là phép toán cơ bản trong nhiều bài toán tính toán số.
+Khi thực hiện trên FPGA, bộ nhân cần cho kết quả chính xác, có thời gian
+xử lý phù hợp và sử dụng tài nguyên phần cứng hợp lý.
+
+Mỗi phần tử $C_{i,j}$ được tính bằng tích vô hướng giữa hàng $i$ của
+ma trận $A$ và cột $j$ của ma trận $B$. Với hai ma trận $8\times8$,
+bộ nhân cần thực hiện $64\times8=512$ phép nhân để tạo đủ 64 phần tử
+của $C$. Mỗi phần tử của $A$ được dùng cho tám cột kết quả, còn mỗi
+phần tử của $B$ được dùng cho tám hàng kết quả. Đặc điểm này cho phép
+tái sử dụng toán hạng đã đọc từ bộ nhớ.
+
+Đề tài hướng đến các mục tiêu sau:
+
+\begin{itemize}
+    \item \textbf{Thực hiện chính xác phép nhân ma trận.}
+    Thiết kế bộ nhân $C=A\cdot B$ trên FPGA với hai ma trận đầu vào
+    $8\times8$, phần tử có dấu 16 bit.
+
+    \item \textbf{Tối ưu phép nhân ma trận.}
+    Tối ưu nhân ma trận với data reuse và kiểm thử so sánh với những
+    phương pháp tuần tự khác.
+
+    \item \textbf{Đánh giá chi phí phần cứng.}
+    So sánh số phần tử logic, tài nguyên sử dụng trên bộ nhân FPGA 
+    và công suất tiêu thụ trên bộ nhân.
+\end{itemize}
+
+\subsection{Phạm vi triển khai và tiêu chí đánh giá}
+
+\begin{itemize}
+    \item \textbf{Phạm vi triển khai:} Thiết kế bộ nhân hai ma trận
+    $8\times8$ trên FPGA Cyclone IV E EP4CE6E22C8.
+
+    \item \textbf{Độ chính xác:} Bộ nhân phải cho kết quả chính xác
+    trên toàn bộ miền giá trị đầu vào 16 bit có dấu và đầu ra 16 bit
+    có dấu và đối chiếu so sánh với nhân ma trận thủ công.
+
+    \item \textbf{Đánh giá:} So sánh số chu kỳ xử lý, thông lượng,
+    số LE, số bộ nhân chuyên dụng, số khối nhớ M9K.
+\end{itemize}

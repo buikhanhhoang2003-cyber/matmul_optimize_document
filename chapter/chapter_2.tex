@@ -1,0 +1,271 @@
+\section{Đặc tả bài toán và nền tảng phần cứng}
+
+
+\subsection{Phép nhân ma trận 8x8 và yêu cầu độ chính xác}
+
+Xét hai ma trận đầu vào $A$ và $B$, mỗi ma trận có kích thước
+$8\times8$, với các phần tử là số nguyên có dấu 16-bit.
+Phép nhân hai ma trận tạo ra ma trận kết quả $C=A\cdot B$,
+có cùng kích thước $8\times8$.
+
+Mỗi phần tử $C_{i,j}$ được tính bằng tích vô hướng giữa
+hàng thứ $i$ của ma trận $A$ và cột thứ $j$ của ma trận $B$:
+
+\begin{equation}
+C_{i,j} = \sum_{k=0}^{7} A_{i,k}B_{k,j},
+\qquad 0 \leq i,j \leq 7.
+\tag{2.1}
+\end{equation}
+
+Như vậy, để tính một phần tử đầu ra, hệ thống cần thực hiện
+8 phép nhân và cộng các tích tương ứng. Toàn bộ phép nhân
+ma trận $8\times8$ gồm 64 phần tử đầu ra, tương ứng với
+512 phép nhân và 448 phép cộng khi thực hiện độc lập
+từng tích vô hướng.
+
+Hình~\ref{fig:matrix_multiplication} minh họa nguyên lý
+tính một phần tử của ma trận kết quả.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    >=Latex,
+    font=\small,
+    cell/.style={
+        draw=gray!65,
+        minimum width=0.58cm,
+        minimum height=0.58cm,
+        inner sep=0pt
+    }
+]
+
+% Matrix A
+\begin{scope}[shift={(0,0)}]
+\node[font=\bfseries] at (2.32,0.65) {Ma trận $A$};
+\foreach \r in {0,...,7} {
+    \foreach \c in {0,...,7} {
+        \pgfmathtruncatemacro{\isrow}{\r==3}
+        \ifnum\isrow=1
+            \def\fillcolor{blue!22}
+        \else
+            \def\fillcolor{white}
+        \fi
+        \node[cell,fill=\fillcolor]
+            at (0.29+0.58*\c,-0.29-0.58*\r) {};
+    }
+}
+\node[font=\scriptsize] at (2.32,-2.03)
+    {$A_{i,0}\ \cdots\ A_{i,7}$};
+\end{scope}
+
+% Matrix B
+\begin{scope}[shift={(6.0,0)}]
+\node[font=\bfseries] at (2.32,0.65) {Ma trận $B$};
+\foreach \r in {0,...,7} {
+    \foreach \c in {0,...,7} {
+        \pgfmathtruncatemacro{\iscol}{\c==4}
+        \ifnum\iscol=1
+            \def\fillcolor{orange!30}
+        \else
+            \def\fillcolor{white}
+        \fi
+        \node[cell,fill=\fillcolor]
+            at (0.29+0.58*\c,-0.29-0.58*\r) {};
+    }
+}
+\node[font=\scriptsize,rotate=90]
+    at (2.61,-2.32) {$B_{0,j},\ldots,B_{7,j}$};
+\end{scope}
+
+% Matrix C
+\begin{scope}[shift={(12.0,0)}]
+\node[font=\bfseries] at (2.32,0.65) {Ma trận $C$};
+\foreach \r in {0,...,7} {
+    \foreach \c in {0,...,7} {
+        \pgfmathtruncatemacro{\istarget}{(\r==3)&&(\c==4)}
+        \ifnum\istarget=1
+            \def\fillcolor{green!35}
+        \else
+            \def\fillcolor{white}
+        \fi
+        \node[cell,fill=\fillcolor]
+            at (0.29+0.58*\c,-0.29-0.58*\r) {};
+    }
+}
+\node[font=\scriptsize,fill=white,inner sep=1pt]
+    at (2.61,-2.03) {$C_{i,j}$};
+\end{scope}
+
+% Operators
+\node[font=\Large] at (5.32,-2.32) {$\times$};
+\node[font=\Large] at (11.32,-2.32) {$=$};
+
+% Explanation
+\node[
+    draw=gray!50,
+    rounded corners=3pt,
+    fill=gray!5,
+    align=center,
+    text width=12.5cm,
+    inner sep=9pt
+] at (8.32,-6.0) {
+    \textbf{Tính phần tử $C_{i,j}$}\\[5pt]
+    $C_{i,j} =
+    A_{i,0}B_{0,j}+
+    A_{i,1}B_{1,j}+\cdots+
+    A_{i,7}B_{7,j}$
+};
+
+\end{tikzpicture}
+\caption{Minh họa phép nhân ma trận $8\times8$:
+hàng thứ $i$ của ma trận $A$ nhân với cột thứ $j$
+của ma trận $B$ để tạo phần tử $C_{i,j}$.}
+\label{fig:matrix_multiplication}
+\end{figure}
+
+\noindent
+\textbf{Yêu cầu về độ chính xác:}
+
+Các phần tử đầu vào được biểu diễn dưới dạng số nguyên
+có dấu 16-bit theo mã bù hai, với miền giá trị:
+
+\begin{equation}
+-2^{15} \leq A_{i,k},B_{k,j} \leq 2^{15}-1.
+\tag{2.2}
+\end{equation}
+
+Tích của hai số nguyên có dấu 16-bit cần tối đa 32-bit
+để biểu diễn chính xác. Do mỗi phần tử đầu ra là tổng
+của 8 tích, bộ tích lũy cần được mở rộng để tránh
+tràn số trong quá trình tính toán.
+
+Giá trị dương lớn nhất của một phần tử kết quả là:
+
+\begin{equation}
+C_{\max}=8\times(-2^{15})^2=2^{33}.
+\tag{2.3}
+\end{equation}
+
+Giá trị âm nhỏ nhất là:
+
+\begin{equation}
+C_{\min}
+=8\times(-2^{15})(2^{15}-1)
+=-2^{33}+2^{18}.
+\tag{2.4}
+\end{equation}
+
+\begin{table}[H]
+    \centering
+    \caption{Đầu vào và đầu ra của phép nhân ma trận}
+    \label{tab:matrix_bitwidth}
+
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}p{3cm}
+        >{\raggedright\arraybackslash}X
+    }
+        \toprule
+        \textbf{Thành phần} &
+        \textbf{Độ rộng mỗi giá trị} &
+        \textbf{Mô tả} \\
+        \midrule
+
+        Ma trận đầu vào ($A$) và ($B$) &
+        16 bit có dấu &
+        $8 \times 8$ phần tử mỗi ma trận \\
+
+        Tích trung gian ($A_{i,k}B_{k,j}$) &
+        32 bit có dấu &
+        8 tích cho mỗi phần tử $C_{i,j}$ \\
+
+        Tổng tích lũy &
+        35 bit có dấu &
+        Cộng dồn 8 tích để tính $C_{i,j}$ \\
+
+        Ma trận kết quả ($C$) &
+        35 bit có dấu &
+        $8 \times 8$ phần tử đầu ra \\
+
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Tài nguyên phần cứng của FPGA EP4CE6E22C8}
+
+Thiết bị sử dụng trong đề tài là \textbf{EP4CE6E22C8}, thuộc dòng FPGA Cyclone IV E. Ba nhóm tài nguyên liên quan trực tiếp đến bộ nhân ma trận là LE, BRAM và bộ nhân chuyên dụng (DSP).
+
+\begin{table}[H]
+    \centering
+    \caption{Tài nguyên phần cứng của FPGA EP4CE6E22C8}
+    \label{tab:fpga_resources}
+
+    \begin{tabularx}{\textwidth}{X r}
+        \toprule
+        \textbf{Tài nguyên} &
+        \textbf{Số lượng hoặc dung lượng} \\
+        \midrule
+        Phần tử logic (LE) & 6.272 \\
+        Khối logic (LAB) & 392 \\
+        Khối bộ nhớ M9K & 30 \\
+        Tổng dung lượng bộ nhớ M9K & 270 Kbit \\
+        Bộ nhân DSP ($18 \times 18$) & 15 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\begin{itemize}
+    \item Logic khả trình. Mỗi khối LAB gồm 16 phần tử logic (LE). Các LE được dùng để thực hiện mạch tổ hợp và thanh ghi, chẳng hạn như bộ cộng tích lũy, bộ chọn dữ liệu và mạch điều khiển.
+    \item Bộ nhớ nhúng. Các khối M9K có thể lưu ma trận đầu vào, tổng tích lũy và kết quả. Số khối cần dùng phụ thuộc vào độ rộng từ, số từ lưu trữ và cấu hình cổng đọc, ghi. Vì vậy, khi đánh giá tài nguyên bộ nhớ, cần xem xét cả số bit lưu trữ và số khối M9K được sử dụng.
+    \item Bộ nhân chuyên dụng. Mỗi khối nhân nhúng hỗ trợ một phép nhân $18 \times 18$ hoặc tối đa hai phép nhân $9 \times 9$. Với toán hạng có dấu 16 bit của đề tài, một phép nhân có thể được ánh xạ trực tiếp vào một khối ở chế độ $18 \times 18$. Theo cách ánh xạ này, EP4CE6 hỗ trợ tối đa 15 phép nhân $16 \times 16$ đồng thời bằng phần cứng chuyên dụng. Phép cộng tích lũy có thể được thực hiện bằng các phần tử logic.
+\end{itemize}
+
+\subsection{Thiết kế sơ đồ tổng quan hệ thống}
+
+Hệ thống gồm ba khối: máy tính người dùng (\textit{User PC}), bộ chuyển
+đổi USB--TTL và FPGA. Máy tính gửi hai ma trận $A$, $B$ qua USB.
+Bộ chuyển đổi đưa dữ liệu đến FPGA qua UART. Sau khi tính
+$C=A\times B$, FPGA gửi ma trận kết quả về máy tính theo chiều ngược
+lại để giao diện hiển thị và đối chiếu.
+
+\begin{center}
+\begin{minipage}{0.96\linewidth}
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+    x=1mm, y=1mm, >=stealth,
+    font=\normalfont\sffamily\small,
+    khoi/.style={draw=black!70, thick, rounded corners=1.5mm},
+    nhap/.style={->, thick, draw=blue!65!black},
+    tra/.style={->, thick, draw=teal!70!black}
+]
+    % Ba khối của hệ thống
+    \path[khoi, fill=blue!5] (0,0) rectangle (30,18);
+    \node at (15,11.5) {\textbf{User PC}};
+    \node at (15,6) {GUI Python};
+
+    \path[khoi, fill=gray!8] (64,0) rectangle (96,18);
+    \node at (80,11.5) {\textbf{USB--TTL}};
+    \node at (80,6) {CP210x};
+
+    \path[khoi, fill=teal!6] (130,0) rectangle (160,18);
+    \node at (145,11.5) {\textbf{FPGA}};
+    \node at (145,6) {Cyclone IV E};
+
+    % Hàng trên: máy tính gửi hai ma trận đến FPGA
+    \draw[nhap] (30,12.5) -- (64,12.5);
+    \draw[nhap] (96,12.5) -- (130,12.5);
+    \node[above] at (47,12.5) {Gửi $A$, $B$};
+    \node[above] at (113,12.5) {Gửi $A$, $B$};
+
+    % Hàng dưới: FPGA trả ma trận kết quả về máy tính
+    \draw[tra] (130,5.5) -- (96,5.5);
+    \draw[tra] (64,5.5) -- (30,5.5);
+    \node[below] at (113,5.5) {Trả kết quả $C$};
+    \node[below] at (47,5.5) {Trả kết quả $C$};
+\end{tikzpicture}%
+}
+\captionof{figure}{Sơ đồ hệ thống nạp ma trận từ máy tính và đọc kết quả từ FPGA.}
+\label{fig:matmul_system_overview}
+\end{minipage}
+\end{center}

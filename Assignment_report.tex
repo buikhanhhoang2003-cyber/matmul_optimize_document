@@ -1,0 +1,470 @@
+
+\documentclass[a4paper,12pt]{article}
+
+% ============================================================
+% 1. PACKAGES
+% ============================================================
+
+% Vietnamese support
+\usepackage{vntex}
+
+% Page layout
+\usepackage[
+    a4paper,
+    left=3cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm,
+    headheight=38pt,
+    headsep=12pt,
+    footskip=18pt
+]{geometry}
+
+% Mathematics
+\usepackage{amsmath,amssymb,latexsym}
+
+% Figures and tables
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{rotating}
+
+% Typography and spacing
+\usepackage{indentfirst}
+\usepackage{setspace}
+\usepackage[shortlabels]{enumitem}
+\usepackage{titlesec}
+\usepackage{multicol}
+
+% Headers and footers
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+% Algorithms and source code
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage[framemethod=tikz]{mdframed}
+
+% Dates and hyperlinks
+\usepackage{datetime2}
+\usepackage{hyperref}
+
+\usetikzlibrary{arrows,snakes,backgrounds}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=blue
+}
+
+% ============================================================
+% 2. DOCUMENT TYPOGRAPHY
+% ============================================================
+
+% Line spacing
+\setstretch{1.2}
+
+% Paragraph indentation
+\setlength{\parindent}{1.25cm}
+
+% Space between paragraphs
+\setlength{\parskip}{0.2em}
+
+% Avoid widows and orphans
+\widowpenalty=10000
+\clubpenalty=10000
+
+% ============================================================
+% 3. SECTION AND SUBSECTION FORMATTING
+% ============================================================
+
+% Section formatting
+\titleformat{\section}
+    {\normalfont\Large\bfseries}
+    {\thesection}
+    {0.8em}
+    {}
+
+% Subsection formatting
+\titleformat{\subsection}
+    {\normalfont\large\bfseries}
+    {\thesubsection}
+    {0.8em}
+    {}
+
+% Subsubsection formatting
+\titleformat{\subsubsection}
+    {\normalfont\normalsize\bfseries}
+    {\thesubsubsection}
+    {0.8em}
+    {}
+
+% Spacing around headings
+\titlespacing*{\section}
+    {0pt}{1.5em}{0.8em}
+
+\titlespacing*{\subsection}
+    {0pt}{1.2em}{0.5em}
+
+\titlespacing*{\subsubsection}
+    {0pt}{1em}{0.4em}
+
+% Numbering depth
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+
+% Fourth-level section support
+\makeatletter
+
+\newcounter{subsubsubsection}[subsubsection]
+
+\renewcommand{\thesubsubsubsection}{%
+    \thesubsubsection.\alph{subsubsubsection}%
+}
+
+\newcommand{\subsubsubsection}{%
+    \@startsection{subsubsubsection}{4}{\z@}%
+    {-3.25ex\@plus -1ex \@minus -.2ex}%
+    {1.5ex \@plus .2ex}%
+    {\normalfont\normalsize\bfseries}%
+}
+
+\newcommand*{\l@subsubsubsection}{%
+    \@dottedtocline{4}{10.0em}{4.1em}%
+}
+
+\newcommand*{\subsubsubsectionmark}[1]{}
+\def\toclevel@subsubsubsection{4}
+
+\makeatother
+
+% ============================================================
+% 4. LIST FORMATTING
+% ============================================================
+
+\setlist[itemize]{
+    leftmargin=2em,
+    itemsep=2pt,
+    topsep=4pt,
+    parsep=0pt
+}
+
+\setlist[enumerate]{
+    leftmargin=2em,
+    itemsep=2pt,
+    topsep=4pt,
+    parsep=0pt
+}
+
+% ============================================================
+% 5. FIGURE AND TABLE FORMATTING
+% ============================================================
+
+% Vietnamese caption names
+\renewcommand{\figurename}{Hình}
+\renewcommand{\tablename}{Bảng}
+
+% Captions
+\captionsetup{
+    font=small,
+    labelfont=bf,
+    labelsep=period,
+    justification=centering
+}
+
+\captionsetup[figure]{
+    position=bottom,
+    skip=6pt
+}
+
+\captionsetup[table]{
+    position=top,
+    skip=6pt
+}
+
+% Number figures and tables by section
+% Example: Hình 2.1, Bảng 2.2
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+
+% Keep floats at top of float-only pages
+\makeatletter
+\setlength{\@fptop}{0pt}
+\makeatother
+
+% ============================================================
+% 6. HEADER AND FOOTER
+% ============================================================
+
+\pagestyle{fancy}
+\fancyhf{}
+
+% Header left
+\fancyhead[L]{%
+    \begin{tabular}{@{}c@{\hspace{3mm}}l@{}}
+        \includegraphics[height=9mm]{hcmut.png}
+        &
+        \begin{tabular}{@{}l@{}}
+            \footnotesize\bfseries
+            Trường Đại học Bách khoa TP. HCM \\
+            \scriptsize
+            Khoa Điện -- Điện tử
+        \end{tabular}
+    \end{tabular}
+}
+
+% Footer left
+\fancyfoot[L]{%
+    \scriptsize
+    Bài tập lớn -- Thiết kế hệ thống số trên FPGA
+}
+
+% Footer right
+\fancyfoot[R]{%
+    \scriptsize
+    Trang \thepage
+}
+
+% Lines
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% Make plain pages use the same header/footer
+\fancypagestyle{plain}{%
+    \fancyhf{}
+    \fancyhead[L]{%
+        \begin{tabular}{@{}c@{\hspace{3mm}}l@{}}
+            \includegraphics[height=9mm]{hcmut.png}
+            &
+            \begin{tabular}{@{}l@{}}
+                \footnotesize\bfseries
+                Trường Đại học Bách khoa TP. HCM \\
+                \scriptsize
+                Khoa Điện -- Điện tử
+            \end{tabular}
+        \end{tabular}
+    }
+    \fancyfoot[L]{%
+        \scriptsize
+        Bài tập lớn -- Thiết kế hệ thống số trên FPGA
+    }
+    \fancyfoot[R]{\scriptsize Trang \thepage}
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.3pt}
+}
+
+% ============================================================
+% 7. SOURCE CODE LISTING
+% ============================================================
+
+\definecolor{dkgreen}{rgb}{0,0.5,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+    frame=tb,
+    language=Verilog,
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle=\small\ttfamily,
+    numbers=left,
+    numberstyle=\tiny\color{codegray},
+    keywordstyle=\color{blue},
+    commentstyle=\color{dkgreen},
+    stringstyle=\color{mauve},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=4,
+    stepnumber=1,
+    numbersep=6pt,
+    firstnumber=1,
+    numberfirstline=true
+}
+
+% ============================================================
+% 8. THEOREMS
+% ============================================================
+
+\newtheorem{theorem}{Định lý}
+\newtheorem{property}{Tính chất}
+\newtheorem{proposition}{Mệnh đề}
+\newtheorem{corollary}[proposition]{Hệ quả}
+\newtheorem{lemma}[proposition]{Bổ đề}
+
+% ============================================================
+% 9. VIETNAMESE DOCUMENT TITLES
+% ============================================================
+
+\renewcommand{\contentsname}{MỤC LỤC}
+\renewcommand{\listfigurename}{DANH MỤC HÌNH ẢNH}
+\renewcommand{\listtablename}{DANH MỤC BẢNG BIỂU}
+\renewcommand{\refname}{TÀI LIỆU THAM KHẢO}
+
+% ============================================================
+% BEGIN DOCUMENT
+% ============================================================
+
+\begin{document}
+
+% ============================================================
+% 10. COVER PAGE
+% ============================================================
+
+\begin{titlepage}
+\thispagestyle{empty}
+\centering
+
+% University name
+\vspace*{0.3cm}
+
+{\large\bfseries
+ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH\par}
+
+\vspace{0.15cm}
+
+{\large\bfseries
+TRƯỜNG ĐẠI HỌC BÁCH KHOA\par}
+
+\vspace{0.15cm}
+
+{\normalsize
+KHOA ĐIỆN -- ĐIỆN TỬ\par}
+
+\vspace{0.5cm}
+
+\rule{0.5\textwidth}{0.6pt}
+
+% University logo
+\vspace{0.8cm}
+
+\includegraphics[width=3cm]{hcmut.png}
+
+% Main title block
+\vfill
+
+{\Large\bfseries
+BÁO CÁO BÀI TẬP LỚN\par}
+
+\vspace{0.4cm}
+
+{\large
+THIẾT KẾ HỆ THỐNG SỐ TRÊN FPGA\par}
+
+\vspace{0.6cm}
+
+\rule{0.9\textwidth}{0.8pt}
+
+\vspace{0.4cm}
+
+{\LARGE\bfseries
+THIẾT KẾ BỘ NHÂN HAI MA TRẬN\par}
+
+\vspace{0.3cm}
+
+{\Large\bfseries
+PHẦN TỬ 16-BIT CÓ DẤU TRÊN FPGA\par}
+
+\vspace{0.4cm}
+
+\rule{0.9\textwidth}{0.8pt}
+
+% Instructor and students
+\vfill
+
+\begin{minipage}{0.85\textwidth}
+\raggedright
+
+\begin{tabular}{@{}llr@{}}
+
+\textbf{Giảng viên:}
+    & Nguyễn Lý Thiên Trường & \\[6pt]
+
+\textbf{Sinh viên:}
+    & Phạm Hoàng Lê & 2670142 \\[4pt]
+
+    & Bùi Khánh Hoàng & 2670141 \\[4pt]
+
+    & Đoàn Quốc Huy & 2670105 \\[4pt]
+
+    & Mai Xuân Cảnh & 2570621 \\
+
+\end{tabular}
+
+\end{minipage}
+
+% Automatic month/year
+\vspace{1.2cm}
+
+{\small
+TP. HỒ CHÍ MINH,
+THÁNG \the\month/\the\year\par}
+
+\end{titlepage}
+
+% ============================================================
+% 11. FRONT MATTER
+% ============================================================
+
+% Roman numbering for contents and lists
+\pagenumbering{roman}
+
+% Table of Contents
+\tableofcontents
+\clearpage
+
+% List of Figures
+\listoffigures
+\clearpage
+
+% List of Tables
+\listoftables
+\clearpage
+
+% ============================================================
+% 12. MAIN CONTENT
+% ============================================================
+
+% Arabic numbering for main chapters
+\pagenumbering{arabic}
+
+\include{chapter/chapter_1}
+\include{chapter/chapter_2}
+\include{chapter/chapter_3}
+\include{chapter/chapter_4}
+\include{chapter/chapter_5}
+\include{chapter/chapter_6}
+
+% ============================================================
+% 13. REFERENCES
+% ============================================================
+
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{TÀI LIỆU THAM KHẢO}
+
+\begin{thebibliography}{80}
+
+\bibitem{CVX}
+CVX Introduction,
+\textit{What is CVX},
+\url{http://cvxr.com/cvx/doc/intro.html/},
+lần truy cập cuối: 15/04/2017.
+
+\end{thebibliography}
+
+% ============================================================
+% END DOCUMENT
+% ============================================================
+
+\end{document}
